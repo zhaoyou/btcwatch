@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!--Load the AJAX API-->
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript">
+
+      // Load the Visualization API and the piechart package.
+      google.load('visualization', '1.0', {'packages':['corechart']});
+
+      // Set a callback to run when the Google Visualization API is loaded.
+      google.setOnLoadCallback(init);
+
+
+      // Callback that creates and populates a data table,
+      // instantiates the pie chart, passes in the data and
+      // draws it.
+      function init() {
+        drawChart();
+        var timer = window.setInterval(drawChart, 60000);
+      }
+
+      function drawChart() {
+        var data_url = location.protocol + '//' + location.host + '/data';
+        $.getJSON(data_url, function(data) {
+          data.sort(function(p, n){
+            return p.crawl_time - n.crawl_time;
+          });
+          var items = [];
+          items.push(['Time', 'Buy_RMB', 'Sell_RMB', 'Buy_USD', 'Sell_USD']);
+          $.each(data, function(key, obj) {
+            items.push([obj.update_time,
+              obj.markets[0].buy.cny,
+              obj.markets[0].sell.cny,
+              obj.markets[0].buy.usd,
+              obj.markets[0].sell.usd]);
+          });
+
+          console.log('draw line');
+          draw_line(items);
+
+        });
+      }
+
+
+      function draw_line(items) {
+        var data = google.visualization.arrayToDataTable(items);
+
+        var options = {
+          title: 'BTCChina'
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('chart_line_div'));
+        chart.draw(data, options);
+      }
+    </script>
+  </head>
+
+  <body>
+    <!--Div that will hold the pie chart-->
+    <div id="chart_line_div" style="width: 100%;height:500px;"></div>
+  </body>
+</html>
