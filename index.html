@@ -28,30 +28,36 @@
             return p.crawl_time - n.crawl_time;
           });
           var items = [];
-          items.push(['Time', 'Buy_RMB', 'Sell_RMB', 'Buy_USD', 'Sell_USD']);
+          var mtgox_items = [];
+
+          items.push(['Time', 'Buy', 'Sell', 'Deal']);
+          mtgox_items.push(['Time', 'Buy', 'Sell', 'Deal']);
+
           $.each(data, function(key, obj) {
             items.push([obj.update_time,
               obj.markets[0].buy.cny,
               obj.markets[0].sell.cny,
-              obj.markets[0].buy.usd,
-              obj.markets[0].sell.usd]);
+              obj.markets[0].last.cny]);
+
+            mtgox_items.push([obj.update_time,
+              obj.markets[1].buy.cny,
+              obj.markets[1].sell.cny,
+              obj.markets[1].last.cny]);
+
           });
 
-          console.log('draw line');
-          draw_line(items);
-
+          draw_line(items, 'btcChina', 'btcchina_div');
+          draw_line(mtgox_items, 'mtGox', 'mtgox_div');
         });
       }
 
 
-      function draw_line(items) {
+      function draw_line(items, title, element) {
         var data = google.visualization.arrayToDataTable(items);
-
         var options = {
-          title: 'BTCChina'
+          'title': title
         };
-
-        var chart = new google.visualization.LineChart(document.getElementById('chart_line_div'));
+        var chart = new google.visualization.LineChart(document.getElementById(element));
         chart.draw(data, options);
       }
     </script>
@@ -59,6 +65,7 @@
 
   <body>
     <!--Div that will hold the pie chart-->
-    <div id="chart_line_div" style="width: 100%;height:500px;"></div>
+    <div id="btcchina_div" style="width: 100%;height:650px;"></div>
+    <div id="mtgox_div" style="width: 100%;height:650px;"></div>
   </body>
 </html>
